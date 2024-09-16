@@ -1,0 +1,52 @@
+.download {
+	position: relative;
+	display: inline-block;
+}
+
+.download:hover .download-icon {
+	display: block;
+}
+
+.download-icon {
+	/*padding-top: 18px;	
+	padding-right: 14px;*/
+	position: absolute;
+	right: .5rem;
+	/*left: 0.5rem;*/
+	top: .7rem;
+	display: none;
+}
+
+[tooltip]:before {
+    /* needed - do not touch */
+    content: attr(tooltip);
+    position: absolute;
+    opacity: 0;
+    
+    /* customizable */
+    transition: all 0.15s ease;
+    padding: 5px;
+    //color: #333;
+    color: white;
+    border-radius: 10px;
+    font-family: sans-serif;
+    font-size: .8rem;
+    //box-shadow: 2px 2px 1px silver;    
+}
+
+[tooltip]:hover:before {
+    /* needed - do not touch */
+    opacity: 1;
+    
+    /* customizable */
+    background: black;
+    /*margin-top: -50px;
+    margin-left: 20px;*/    
+    /*margin-top: 100%;
+    margin-left: -100%;*/
+	/*right: 0;
+	top: 0;*/
+	transform: translate(-102%, 0%);
+}
+
+
