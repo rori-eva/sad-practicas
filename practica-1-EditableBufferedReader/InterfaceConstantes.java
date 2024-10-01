@@ -5,19 +5,19 @@
 public interface InterfaceConstantes {
 
     // CONSTANTES   -----------------------------------------------------------
-    // Teclas en ASCII
-    public static final int ENTER            = 10;
-    public static final int ESCAPE           = 27;
-    public static final int FLECHA_ARRIBA    = 65;
-    public static final int FLECHA_ABAJO     = 66;
-    public static final int FLECHA_DERECHA   = 67;
-    public static final int FLECHA_IZQUIERDA = 68;
-    public static final int INICIO           = 72;
-    public static final int FIN              = 70;
-    public static final int INSERT           = 50;
-    public static final int SUPRIMIR         = 51;
-    public static final int BACKSPACE        = 2;
-    public static final int CR               = 13;
+    // Teclas en ASCII (en negativo para una mejor identificación)
+    public static final int ENTER            = -10;
+    public static final int ESCAPE           = -27;
+    public static final int FLECHA_ARRIBA    = -65;
+    public static final int FLECHA_ABAJO     = -66;
+    public static final int FLECHA_DERECHA   = -67;
+    public static final int FLECHA_IZQUIERDA = -68;
+    public static final int INICIO           = -72;
+    public static final int FIN              = -70;
+    public static final int INSERT           = -50;
+    public static final int SUPRIMIR         = -51;
+    public static final int BACKSPACE        = -2;
+    public static final int CR               = -13;
 
     // Comandos del cursor
     public static final String DCHA_CMD      = "\u001b[1C";
@@ -29,7 +29,7 @@ public interface InterfaceConstantes {
 
     // Comandos de la pantalla
     public static final String LIMPIAR_PANTALLA = "\u001b[2J";
-    public static final String LIMPIAR_LINEA =  "\u001b[2K";
+    public static final String LIMPIAR_LINEA    = "\u001b[2K";
 
     // FUNCIONES   ------------------------------------------------------------
     /**
