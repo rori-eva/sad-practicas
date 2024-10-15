@@ -1,5 +1,6 @@
 /*
  * This class is a extension of BufferedReader
+ * Siguiendo el patrón MVC esta clase es del tipo Controller
  */
 
 import java.io.BufferedReader;
