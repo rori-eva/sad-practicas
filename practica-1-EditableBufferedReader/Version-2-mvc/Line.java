@@ -1,5 +1,6 @@
 /*
  * La clase Line maneja todas las acciones relacionadas con la línea de texto.
+ * Siguiendo el patrón MVC esta clase es del tipo Model
  */
 
 public class Line {
@@ -148,4 +149,6 @@ public class Line {
         System.out.print("\r" + this.line.toString());
         System.out.print(InterfaceConstantes.RESTAURAR_POS);
     }
+
+    //Nombre maxim de lineas del terminal
 }
