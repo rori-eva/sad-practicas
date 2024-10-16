@@ -7,34 +7,22 @@ import java.io.BufferedReader;
 import java.io.Reader;
 import java.io.IOException;
 
+@SuppressWarnings("deprecation")
 public class EditableBufferedReader extends BufferedReader implements InterfaceConstantes {
     private boolean modoInsert = false;
     private boolean modoSuprimir = false;
+    private Line line;
+    private Console view;
 
     public EditableBufferedReader(Reader in) {
         super(in);
     }
 
-    /**
-     * Configura la consola en modo raw, permitiendo la lectura de teclas especiales, y carácteres
-     * individuales sin buffering
-     * Lee carácter a carácter sin esperar el ENTER
-     * 
-     * @throws  IOException
-
-     */
-    public void setRaw() throws IOException {
-        Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", "stty -echo raw < /dev/tty" });
-    }
-
-    /**
-     * Configura la consola en modo cooked, permitiendo la lectura de caracteres
-     * Los carácteres son leídos después del ENTER
-     * 
-     * @throws  IOException
-     */
-    public void unsetRaw() throws IOException {
-        Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", "stty echo cooked < /dev/tty" });
+    public EditableBufferedReader(Reader in, Line line, Console view) {
+        super(in);
+        this.line = line;
+        this.view = view;
+        this.line.addObserver(view);
     }
 
     /**
@@ -91,9 +79,9 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
      */
     @Override
     public String readLine() throws IOException {
-        Line line = new Line();
+        // Line line = new Line();
         int charCode = 0;
-        this.setRaw();
+        view.setRaw();
 
         while ((charCode = this.read()) != '\r') { // '\r' es el ENTER en modo raw
             if (charCode == -1) {
@@ -137,7 +125,7 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
             }
             line.printLinea();
         }
-        this.unsetRaw();
+        view.unsetRaw();
 
         return line.toString();
     }

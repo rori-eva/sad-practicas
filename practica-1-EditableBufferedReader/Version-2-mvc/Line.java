@@ -3,7 +3,10 @@
  * Siguiendo el patrón MVC esta clase es del tipo Model
  */
 
-public class Line {
+import java.util.Observable;
+
+@SuppressWarnings("deprecation")
+public class Line extends Observable {
     private StringBuilder line;  // La linea a dibujar
     private int cursorPosition;  // Posicion del cursor
 
@@ -18,7 +21,12 @@ public class Line {
     * @param cursorPosition    La nueva posición del cursor
     */
     public void setCursorPosition(int cursorPosition) {
-        this.cursorPosition = cursorPosition;
+        if (cursorPosition >=  0 && cursorPosition <= line.length()) {
+            this.cursorPosition = cursorPosition;
+            // Notifica al observador que el estado ha cambiado
+            setChanged();
+            notifyObservers();
+        }
     }
 
     /**
@@ -44,8 +52,9 @@ public class Line {
      */
     public void moverDerecha() {
         if (cursorPosition < line.length()) {
-            System.out.print(InterfaceConstantes.DCHA_CMD);
             cursorPosition++;
+            setChanged();
+            notifyObservers();
         }
     }
 
@@ -54,8 +63,9 @@ public class Line {
      */
     public void moverIzquierda() {
         if (cursorPosition > 0) {
-            System.out.print(InterfaceConstantes.IZQ_CMD);
             cursorPosition--;
+            setChanged();
+            notifyObservers();
         }
     }
 
@@ -63,16 +73,18 @@ public class Line {
      * Mueve el cursor al inicio de la línea, tecla INICIO
      */
     public void moverInicio() {
-        System.out.print(InterfaceConstantes.INICIO_CMD);
         cursorPosition = 0;
+        setChanged();
+        notifyObservers();
     }
 
     /**
      * Mueve el cursor al final de la línea, tecla FIN
      */
     public void moverFinal() {
-        System.out.print(InterfaceConstantes.FIN_CMD);
         cursorPosition = line.length();
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -84,6 +96,8 @@ public class Line {
     public void agregar(char c) {
         line.insert(cursorPosition, c);
         cursorPosition++;
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -110,6 +124,8 @@ public class Line {
         }
         // Avanzamos el cursor después de la inserción/reemplazo
         cursorPosition++;
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -120,6 +136,8 @@ public class Line {
         if (cursorPosition > 0) {
             line.deleteCharAt(cursorPosition - 1);
             cursorPosition--;
+            setChanged();
+            notifyObservers();
         }
     }
 
@@ -129,6 +147,8 @@ public class Line {
     public void suprimir() {
         if (cursorPosition < line.length()) {
             line.deleteCharAt(cursorPosition);
+            setChanged();
+            notifyObservers();
         }
     }
 
@@ -149,6 +169,4 @@ public class Line {
         System.out.print("\r" + this.line.toString());
         System.out.print(InterfaceConstantes.RESTAURAR_POS);
     }
-
-    //Nombre maxim de lineas del terminal
 }
