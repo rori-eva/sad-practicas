@@ -8,11 +8,11 @@ import java.util.Observable;
 @SuppressWarnings("deprecation")
 public class Line extends Observable {
     private StringBuilder line;  // La linea a dibujar
-    private int cursorPosition;  // Posicion del cursor
+    protected int cursorPosition;  // Posicion del cursor
 
     public Line() {
         this.line = new StringBuilder("");
-        cursorPosition = 0;
+        this.cursorPosition = 0;
     }
 
     /**
