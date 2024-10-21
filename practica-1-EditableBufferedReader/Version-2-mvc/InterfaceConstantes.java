@@ -20,6 +20,8 @@ public interface InterfaceConstantes {
     public static final int CR               = 13;
 
     // Comandos del cursor
+    public static final String ARRIBA_CMD    = "\u001B[1A";
+    public static final String ABAJO_CMD     = "\u001B[1B";
     public static final String DCHA_CMD      = "\u001b[1C";
     public static final String IZQ_CMD       = "\u001b[1D";
     public static final String INICIO_CMD    = "\u001b[0D";

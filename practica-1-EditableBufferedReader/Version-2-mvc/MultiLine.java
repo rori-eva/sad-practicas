@@ -6,7 +6,7 @@
  import java.util.List;
  import java.util.Observable;
 
- @SuppressWarnings("deprecation")
+@SuppressWarnings("deprecation")
 public class MultiLine extends Line {
     private List<Line> lineas;
     private int actualLinea;
@@ -31,17 +31,43 @@ public class MultiLine extends Line {
 
     @Override
     public void borrar() {
-        lineas.get(actualLinea).borrar();
+        if (cursorPosition == 0 && actualLinea > 0) {
+            // Mover el contenido de la línea actual a la anterior y eliminar la línea actual
+            Line lineaAnterior = lineas.get(actualLinea - 1);
+            Line lineaActual = lineas.get(actualLinea);
+            cursorPosition = lineaAnterior.toString().length();
+            lineaAnterior.concatenarConAnterior(lineaActual);
+            lineas.remove(actualLinea);
+            actualLinea--;
+        } else if (cursorPosition > 0) {
+            lineas.get(actualLinea).borrar();
+            cursorPosition--;
+        }
+        setChanged();
+        notifyObservers();
     }
 
     @Override
     public void suprimir() {
-        lineas.get(actualLinea).suprimir();
+        Line lineaActual = lineas.get(actualLinea);
+        if (cursorPosition < lineaActual.getLineLength()) {
+            lineaActual.suprimir();
+        } else if (cursorPosition == lineaActual.getLineLength() && actualLinea < lineas.size() - 1) {
+            Line siguienteLinea = lineas.get(actualLinea + 1);
+            lineaActual.concatenarConAnterior(siguienteLinea);
+            lineas.remove(actualLinea+1);
+        }
+        setChanged();
+        notifyObservers();
     }
 
     @Override
     public String toString() {
-        return lineas.get(actualLinea).toString();
+        StringBuilder sb = new StringBuilder();
+        for (Line line: lineas) {
+            sb.append(line.toString()).append("\n");
+        }
+        return sb.toString();
     }
 
     public void printMultiLinea() {
@@ -60,16 +86,32 @@ public class MultiLine extends Line {
     public void moverArriba() {
         if (actualLinea > 0) {
             actualLinea--;
-            cursorPosition = Math.min(cursorPosition, lineas.get(actualLinea).toString().length());
+            //cursorPosition = Math.min(cursorPosition, lineas.get(actualLinea).toString().length());
+            setChanged();
+            notifyObservers();
         }
-        printMultiLinea();
+        //printMultiLinea();
     }
 
     public void moverAbajo() {
         if (actualLinea < lineas.size() - 1) {
             actualLinea++;
-            cursorPosition = Math.min(cursorPosition, lineas.get(actualLinea).toString().length());
+            //cursorPosition = Math.min(cursorPosition, lineas.get(actualLinea).toString().length());
+            setChanged();
+            notifyObservers();
         }
-        printMultiLinea();
+        //printMultiLinea();
+    }
+
+    public void nuevaLinea() {
+        lineas.add(actualLinea+1, new Line());
+        actualLinea++;
+        super.cursorPosition = 0;
+        setChanged();
+        notifyObservers();
+    }
+
+    public Line getActualLinea(int actualLinea) {
+        return lineas.get(actualLinea);
     }
 }

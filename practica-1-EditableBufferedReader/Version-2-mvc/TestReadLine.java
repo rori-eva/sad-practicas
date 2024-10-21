@@ -2,7 +2,7 @@ import java.io.*;
 
 public class TestReadLine {
   public static void main(String[] args) {
-    BufferedReader in =  new EditableBufferedReader(new InputStreamReader(System.in), new Line(), new Console());
+    BufferedReader in =  new EditableBufferedReader(new InputStreamReader(System.in), new Console());
     String str = null;
     try {
       str = in.readLine();

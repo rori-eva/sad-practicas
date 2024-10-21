@@ -21,6 +21,11 @@ public class Console implements Observer, InterfaceConstantes {
             Line line = (Line) o;
             line.printLinea();
         }
+
+        if (o instanceof MultiLine) {
+            MultiLine multiLine = (MultiLine) o;
+            multiLine.printMultiLinea();
+        }
     }
 
     /**

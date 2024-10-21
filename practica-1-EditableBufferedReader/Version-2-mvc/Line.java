@@ -169,4 +169,10 @@ public class Line extends Observable {
         System.out.print("\r" + this.line.toString());
         System.out.print(InterfaceConstantes.RESTAURAR_POS);
     }
+
+    public void concatenarConAnterior(Line newline) {
+        line.append(newline.toString());
+        setChanged();
+        notifyObservers();
+    }
 }

@@ -11,18 +11,18 @@ import java.io.IOException;
 public class EditableBufferedReader extends BufferedReader implements InterfaceConstantes {
     private boolean modoInsert = false;
     private boolean modoSuprimir = false;
-    private Line line;
+    private MultiLine multiLine;
     private Console view;
 
     public EditableBufferedReader(Reader in) {
         super(in);
     }
 
-    public EditableBufferedReader(Reader in, Line line, Console view) {
+    public EditableBufferedReader(Reader in, Console view) {
         super(in);
-        this.line = line;
+        this.multiLine = new MultiLine();
         this.view = view;
-        this.line.addObserver(view);
+        this.multiLine.addObserver(view);
     }
 
     /**
@@ -40,14 +40,12 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
                 int nextChar = System.in.read(); // Lee la tercera parte de la secuencia de escape
                 // Manejar las teclas de flechas y otras especiales
                 switch (nextChar) {
-                    case 'C':
-                        return FLECHA_DERECHA;
-                    case 'D':
-                        return FLECHA_IZQUIERDA;
-                    case 'H':
-                        return INICIO;
-                    case 'F':
-                        return FIN;
+                    case 'A':    return FLECHA_ARRIBA;
+                    case 'B':    return FLECHA_ABAJO;
+                    case 'C':    return FLECHA_DERECHA;
+                    case 'D':    return FLECHA_IZQUIERDA;
+                    case 'H':    return INICIO;
+                    case 'F':    return FIN;
                     case '2':
                         if (System.in.read() == '~') {
                             modoInsert = !modoInsert; // Alterna el modo de inserción
@@ -60,8 +58,7 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
                             return SUPRIMIR;
                         }
                         break;
-                    default:
-                        return -1;  //  Si no se reconoce la secuencia de escape, retorna -1
+                    default:    return -1;  // Si no se reconoce la secuencia de escape, retorna -1
                 }
             }
         } else if (charCode == 127) {
@@ -79,54 +76,46 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
      */
     @Override
     public String readLine() throws IOException {
-        // Line line = new Line();
         int charCode = 0;
         view.setRaw();
 
-        while ((charCode = this.read()) != '\r') { // '\r' es el ENTER en modo raw
-            if (charCode == -1) {
-                // Cuando read() devuelve -1, indica que el modo de inserción fue activado/desactivado
-                continue; // Continua con el siguiente ciclo sin insertar nada
-            }
+        while (charCode != -1) {
+            charCode = this.read();
 
-            switch (charCode) {
-                case FLECHA_DERECHA:
-                    line.moverDerecha();
-                    break;
-                case FLECHA_IZQUIERDA:
-                    line.moverIzquierda();
-                    break;
-                case INICIO:
-                    line.moverInicio();
-                    break;
-                case FIN:
-                    line.moverFinal();
-                    break;
-                case BACKSPACE:
-                    line.borrar();
-                    break;
-                case SUPRIMIR:
-                    if (modoSuprimir) {
-                        line.suprimir();
-                        modoSuprimir = false;
-                    } else {
-                        // Agrega el carácter si no estamos en modo de suprimir
-                        line.agregar((char) charCode);
-                    }
-                    break;
-                default:
-                    if (modoInsert) {
-                        line.insertar((char) charCode, modoInsert);
-                    } else {
-                        // Agrega el carácter si no estamos en modo de inserción
-                        line.agregar((char) charCode);
-                    }
-                    break;
+            if (charCode == '\r') { // '\r' es el ENTER en modo raw
+                multiLine.nuevaLinea();
+            } else {
+                switch (charCode) {
+                    case FLECHA_ARRIBA:     multiLine.moverArriba();    break;
+                    case FLECHA_ABAJO:      multiLine.moverAbajo();     break;
+                    case FLECHA_DERECHA:    multiLine.moverDerecha();   break;
+                    case FLECHA_IZQUIERDA:  multiLine.moverIzquierda(); break;
+                    case INICIO:            multiLine.moverInicio();    break;
+                    case FIN:               multiLine.moverFinal();     break;
+                    case BACKSPACE:         multiLine.borrar();         break;
+                    case SUPRIMIR:
+                        if (modoSuprimir) {
+                            multiLine.suprimir();
+                            modoSuprimir = false;
+                        } else {
+                            // Agrega el carácter si no estamos en modo de suprimir
+                            multiLine.agregar((char) charCode);
+                        }
+                        break;
+                    default:
+                        if (modoInsert) {
+                            multiLine.insertar((char) charCode, modoInsert);
+                        } else {
+                            // Agrega el carácter si no estamos en modo de inserción
+                            multiLine.agregar((char) charCode);
+                        }
+                        break;
+                }
+                multiLine.printMultiLinea();
             }
-            line.printLinea();
         }
         view.unsetRaw();
 
-        return line.toString();
+        return multiLine.toString();
     }
 }
