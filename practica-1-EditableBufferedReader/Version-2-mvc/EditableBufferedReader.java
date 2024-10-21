@@ -18,9 +18,9 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
         super(in);
     }
 
-    public EditableBufferedReader(Reader in, Line line, Console view) {
+    public EditableBufferedReader(Reader in, Console view) {
         super(in);
-        this.line = line;
+        this.line = new Line();
         this.view = view;
         this.line.addObserver(view);
     }
@@ -109,10 +109,7 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
                     if (modoSuprimir) {
                         line.suprimir();
                         modoSuprimir = false;
-                    } else {
-                        // Agrega el carácter si no estamos en modo de suprimir
-                        line.agregar((char) charCode);
-                    }
+                    } 
                     break;
                 default:
                     if (modoInsert) {
