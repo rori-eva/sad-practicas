@@ -29,7 +29,6 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
      * Lee carácter a carácter la entrada 
      * 
      * @return  el carácter leído en código ASCII o, -1 en caso de no reconocer el carácter o no insertar un carácter
-
      */
     @Override
     public int read() throws IOException {
@@ -79,7 +78,6 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
      */
     @Override
     public String readLine() throws IOException {
-        // Line line = new Line();
         int charCode = 0;
         view.setRaw();
 
@@ -90,21 +88,11 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
             }
 
             switch (charCode) {
-                case FLECHA_DERECHA:
-                    line.moverDerecha();
-                    break;
-                case FLECHA_IZQUIERDA:
-                    line.moverIzquierda();
-                    break;
-                case INICIO:
-                    line.moverInicio();
-                    break;
-                case FIN:
-                    line.moverFinal();
-                    break;
-                case BACKSPACE:
-                    line.borrar();
-                    break;
+                case FLECHA_DERECHA:    line.moverDerecha();    break;
+                case FLECHA_IZQUIERDA:  line.moverIzquierda();  break;
+                case INICIO:            line.moverInicio();     break;
+                case FIN:               line.moverFinal();      break;
+                case BACKSPACE:         line.borrar();          break;
                 case SUPRIMIR:
                     if (modoSuprimir) {
                         line.suprimir();
@@ -115,8 +103,7 @@ public class EditableBufferedReader extends BufferedReader implements InterfaceC
                     if (modoInsert) {
                         line.insertar((char) charCode, modoInsert);
                     } else {
-                        // Agrega el carácter si no estamos en modo de inserción
-                        line.agregar((char) charCode);
+                        line.agregar((char) charCode);  // Agrega el carácter si no estamos en modo de inserción
                     }
                     break;
             }
