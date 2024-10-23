@@ -2,13 +2,30 @@
  * La clase Line maneja todas las acciones relacionadas con la línea de texto.
  */
 
+import java.io.IOError;
+import java.io.IOException;
+
 public class Line {
+    // Comandos del cursor
+    protected static final String DCHA_CMD      = "\u001b[1C";
+    protected static final String IZQ_CMD       = "\u001b[1D";
+    protected static final String INICIO_CMD    = "\u001b[0D";
+    protected static final String FIN_CMD       = "\u001b[$C";
+    protected static final String GUARDAR_POS   = "\u001b[s";
+    protected static final String RESTAURAR_POS = "\u001b[u";
+
+    // Atributos de la clase Line
     private StringBuilder line;  // La linea a dibujar
     private int cursorPosition;  // Posicion del cursor
+    private boolean modoInsert;  // Modo insertar o sustituir
 
+    /**
+     * Constructor de la clase Line
+     */
     public Line() {
         this.line = new StringBuilder("");
         cursorPosition = 0;
+        modoInsert = false;
     }
 
     /**
@@ -23,7 +40,7 @@ public class Line {
     /**
      * Obtiene la posición actual del cursor en la línea
      *
-     * @return    La posición del cursor
+     * @return    La posición del cursor, la columna en la que está
      */
     public int getCursorPosition() {
         return cursorPosition;
@@ -43,7 +60,7 @@ public class Line {
      */
     public void moverDerecha() {
         if (cursorPosition < line.length()) {
-            System.out.print(InterfaceConstantes.DCHA_CMD);
+            System.out.print(DCHA_CMD);
             cursorPosition++;
         }
     }
@@ -53,7 +70,7 @@ public class Line {
      */
     public void moverIzquierda() {
         if (cursorPosition > 0) {
-            System.out.print(InterfaceConstantes.IZQ_CMD);
+            System.out.print(IZQ_CMD);
             cursorPosition--;
         }
     }
@@ -62,7 +79,7 @@ public class Line {
      * Mueve el cursor al inicio de la línea, tecla INICIO
      */
     public void moverInicio() {
-        System.out.print(InterfaceConstantes.INICIO_CMD);
+        System.out.print(INICIO_CMD);
         cursorPosition = 0;
     }
 
@@ -70,19 +87,8 @@ public class Line {
      * Mueve el cursor al final de la línea, tecla FIN
      */
     public void moverFinal() {
-        System.out.print(InterfaceConstantes.FIN_CMD);
+        System.out.print(FIN_CMD);
         cursorPosition = line.length();
-    }
-
-    /**
-     * Agrega un carácter en la posición actual del cursor
-     * Y avanzamos una posición del cursor
-     * 
-     * @param c    El carácter a agregar
-     */
-    public void agregar(char c) {
-        line.insert(cursorPosition, c);
-        cursorPosition++;
     }
 
     /**
@@ -93,13 +99,13 @@ public class Line {
      * @param c             El carácter a insertar
      * @param modoInsert    Indica si se encuentra en modo INSERT
      */
-    public void insertar(char c, boolean modoInsert) {
+    public void insertar(char c) {
         // Si el cursor está al final de la línea, simplemente añadimos el carácter
         if (cursorPosition >= line.length()) {
             line.append(c);
         } else {
             // Reemplaza el carácter en la posición actual
-            if (modoInsert) {
+            if (this.modoInsert) {
                 // Si estamos en modo de inserción, reemplazamos el carácter existente
                 line.setCharAt(cursorPosition, c);
             } else {
@@ -107,8 +113,14 @@ public class Line {
                 line.insert(cursorPosition, c);
             }
         }
-        // Avanzamos el cursor después de la inserción/reemplazo
-        cursorPosition++;
+        cursorPosition++;   // Avanzamos el cursor después de la inserción/reemplazo
+    }
+
+    /**
+     * Alterna el boolean modoInsert en cuanto es tecleada de nuevo la tecla INSERT
+     */
+    public void alternarModoInsert() {
+        this.modoInsert = !this.modoInsert;
     }
 
     /**
@@ -142,10 +154,19 @@ public class Line {
     }
 
     public void printLinea() {
-        System.out.print(InterfaceConstantes.LIMPIAR_PANTALLA);
-        InterfaceConstantes.moveCursorPosition(1, this.cursorPosition);
+        System.out.print(InterfaceConstantes.LIMPIAR_LINEA);
+        this.moveCursorPosition(this.cursorPosition);
         System.out.print(InterfaceConstantes.GUARDAR_POS);
         System.out.print("\r" + this.line.toString());
         System.out.print(InterfaceConstantes.RESTAURAR_POS);
+    }
+
+    /**
+     * Mueve el cursor en una posición determinada
+     * 
+     * @param columna
+     */
+    public void moveCursorPosition(int columna) {
+        System.out.print("\u001b[" + (columna + 1) + "G");
     }
 }
