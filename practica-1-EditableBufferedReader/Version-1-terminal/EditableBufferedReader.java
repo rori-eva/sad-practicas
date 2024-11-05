@@ -113,7 +113,7 @@ public class EditableBufferedReader extends BufferedReader {
                 case INSERT:            line.alternarModoInsert();      break;
                 default:                line.insertar((char) charCode); break;
             }
-            line.printLinea();
+            System.out.flush();
         }
         this.unsetRaw();
 

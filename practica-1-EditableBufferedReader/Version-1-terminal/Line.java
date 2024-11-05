@@ -6,14 +6,6 @@ import java.io.IOError;
 import java.io.IOException;
 
 public class Line {
-    // Comandos del cursor
-    protected static final String DCHA_CMD      = "\u001b[1C";
-    protected static final String IZQ_CMD       = "\u001b[1D";
-    protected static final String INICIO_CMD    = "\u001b[0D";
-    protected static final String FIN_CMD       = "\u001b[$C";
-    protected static final String GUARDAR_POS   = "\u001b[s";
-    protected static final String RESTAURAR_POS = "\u001b[u";
-
     // Atributos de la clase Line
     private StringBuilder line;  // La linea a dibujar
     private int cursorPosition;  // Posicion del cursor
@@ -60,8 +52,8 @@ public class Line {
      */
     public void moverDerecha() {
         if (cursorPosition < line.length()) {
-            System.out.print(DCHA_CMD);
             cursorPosition++;
+            System.out.print("\u001b[1C");
         }
     }
 
@@ -70,8 +62,8 @@ public class Line {
      */
     public void moverIzquierda() {
         if (cursorPosition > 0) {
-            System.out.print(IZQ_CMD);
             cursorPosition--;
+            System.out.print("\u001b[1D");
         }
     }
 
@@ -79,16 +71,16 @@ public class Line {
      * Mueve el cursor al inicio de la línea, tecla INICIO
      */
     public void moverInicio() {
-        System.out.print(INICIO_CMD);
         cursorPosition = 0;
+        System.out.print("\u001b["+cursorPosition+"G");
     }
 
     /**
      * Mueve el cursor al final de la línea, tecla FIN
      */
     public void moverFinal() {
-        System.out.print(FIN_CMD);
         cursorPosition = line.length();
+        System.out.print("\u001b["+cursorPosition+"G");
     }
 
     /**
@@ -100,20 +92,27 @@ public class Line {
      * @param modoInsert    Indica si se encuentra en modo INSERT
      */
     public void insertar(char c) {
-        // Si el cursor está al final de la línea, simplemente añadimos el carácter
-        if (cursorPosition >= line.length()) {
-            line.append(c);
-        } else {
-            // Reemplaza el carácter en la posición actual
-            if (this.modoInsert) {
-                // Si estamos en modo de inserción, reemplazamos el carácter existente
-                line.setCharAt(cursorPosition, c);
+        if(c>=32 && c<=126) {
+            // Si el cursor está al final de la línea, simplemente añadimos el carácter
+            if (cursorPosition >= line.length()) {
+                line.append(c);
+                System.out.print(c);
             } else {
-                // Si no estamos en modo de inserción, desplazamos hacia la derecha e insertamos
-                line.insert(cursorPosition, c);
+                // Reemplaza el carácter en la posición actual
+                if (this.modoInsert) {
+                    // Si estamos en modo de inserción, reemplazamos el carácter existente
+                    line.setCharAt(cursorPosition, c);
+                    System.out.print(c);
+                } else {
+                    // Si no estamos en modo de inserción, desplazamos hacia la derecha e insertamos
+                    line.insert(cursorPosition, c);
+                    for(int i=cursorPosition; i<line.length(); i++) System.out.print(line.charAt(i));
+                    //System.out.print("\u001b["+cursorPosition+"G");
+                }
             }
+            cursorPosition++;   // Avanzamos el cursor después de la inserción/reemplazo
+            System.out.print("\u001b["+(cursorPosition+1)+"G");
         }
-        cursorPosition++;   // Avanzamos el cursor después de la inserción/reemplazo
     }
 
     /**
@@ -125,12 +124,17 @@ public class Line {
 
     /**
      * Borra el carácter anterior al cursor, tecla BACKSPACE
-     * Y retrocedemos una posición el cursor
+     * Retrocedemos una posición el cursor y,
+     * movemos los carácteres de la derecha un paso a la izquierda
      */
     public void borrar() {
         if (cursorPosition > 0) {
             line.deleteCharAt(cursorPosition - 1);
             cursorPosition--;
+            System.out.print("\u001b[1D");
+            for(int i=cursorPosition; i<line.length();i++)   System.out.print(line.charAt(i));
+            System.out.print(" ");
+            System.out.print("\u001b["+(line.length()-cursorPosition+1)+"D");
         }
     }
 
@@ -140,6 +144,9 @@ public class Line {
     public void suprimir() {
         if (cursorPosition < line.length()) {
             line.deleteCharAt(cursorPosition);
+            for(int i=cursorPosition; i<line.length();i++)   System.out.print(line.charAt(i));
+            System.out.print(" ");
+            System.out.print("\u001b["+(line.length()-cursorPosition+1)+"D");
         }
     }
 
@@ -150,23 +157,6 @@ public class Line {
      */
     @Override
     public String toString() {
-        return line.toString().replaceAll("\\u001b\\[[^m]*m", "");
-    }
-
-    public void printLinea() {
-        System.out.print(InterfaceConstantes.LIMPIAR_LINEA);
-        this.moveCursorPosition(this.cursorPosition);
-        System.out.print(InterfaceConstantes.GUARDAR_POS);
-        System.out.print("\r" + this.line.toString());
-        System.out.print(InterfaceConstantes.RESTAURAR_POS);
-    }
-
-    /**
-     * Mueve el cursor en una posición determinada
-     * 
-     * @param columna
-     */
-    public void moveCursorPosition(int columna) {
-        System.out.print("\u001b[" + (columna + 1) + "G");
+        return line.toString();
     }
 }
