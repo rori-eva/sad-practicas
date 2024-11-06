@@ -2,9 +2,6 @@
  * La clase Line maneja todas las acciones relacionadas con la línea de texto.
  */
 
-import java.io.IOError;
-import java.io.IOException;
-
 public class Line {
     // Atributos de la clase Line
     private StringBuilder line;  // La linea a dibujar
@@ -18,15 +15,6 @@ public class Line {
         this.line = new StringBuilder("");
         cursorPosition = 0;
         modoInsert = false;
-    }
-
-    /**
-    * Establece la posición del cursor en la línea
-    *
-    * @param cursorPosition    La nueva posición del cursor
-    */
-    public void setCursorPosition(int cursorPosition) {
-        this.cursorPosition = cursorPosition;
     }
 
     /**
@@ -72,7 +60,7 @@ public class Line {
      */
     public void moverInicio() {
         cursorPosition = 0;
-        System.out.print("\u001b["+cursorPosition+"G");
+        System.out.print("\u001b[G");
     }
 
     /**
@@ -80,7 +68,7 @@ public class Line {
      */
     public void moverFinal() {
         cursorPosition = line.length();
-        System.out.print("\u001b["+cursorPosition+"G");
+        System.out.print("\u001b["+(cursorPosition+1)+"G");
     }
 
     /**
@@ -89,7 +77,6 @@ public class Line {
      * Tecla INSERT
      * 
      * @param c             El carácter a insertar
-     * @param modoInsert    Indica si se encuentra en modo INSERT
      */
     public void insertar(char c) {
         if(c>=32 && c<=126) {

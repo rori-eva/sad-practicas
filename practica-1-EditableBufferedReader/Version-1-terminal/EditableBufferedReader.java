@@ -69,7 +69,7 @@ public class EditableBufferedReader extends BufferedReader {
                     case 'D':    return FLECHA_IZQUIERDA;
                     case 'H':    return INICIO;
                     case 'F':    return FIN;
-                    case '2':   
+                    case '2':
                         if (super.read() == '~')    return INSERT;
                         break;
                     case '3':
