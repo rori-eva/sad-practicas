@@ -1,14 +1,15 @@
 /*
  * La clase Line maneja todas las acciones relacionadas con la línea de texto.
+ * Model class
  */
+import java.util.Observable;
 
- import java.util.Observable;
- @SuppressWarnings("deprecation")
+@SuppressWarnings("deprecation")
 public class Line extends Observable {
     // Atributos de la clase Line
     private StringBuilder line;  // La linea a dibujar
     private boolean modoInsert;  // Modo insertar o sustituir
-    protected int cursorPosition;  // Posicion del cursor
+    private int cursorPosition;  // Posicion del cursor
 
     /**
      * Constructor de la clase Line
@@ -43,8 +44,6 @@ public class Line extends Observable {
     public void moverDerecha() {
         if (cursorPosition < line.length()) {
             cursorPosition++;
-            setChanged();
-            notifyObservers();
         }
     }
 

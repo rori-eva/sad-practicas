@@ -1,5 +1,6 @@
 /*
  * This class is a extension of BufferedReader
+ * Controller class
  */
 
 import java.io.BufferedReader;
@@ -8,10 +9,7 @@ import java.io.IOException;
 
 public class EditableBufferedReader extends BufferedReader {
     // Constantes privadas
-    private static final int ENTER            = 10;
     private static final int ESCAPE           = 27;
-    private static final int FLECHA_ARRIBA    = -65;
-    private static final int FLECHA_ABAJO     = -66;
     private static final int FLECHA_DERECHA   = -67;
     private static final int FLECHA_IZQUIERDA = -68;
     private static final int INICIO           = -72;
@@ -70,6 +68,7 @@ public class EditableBufferedReader extends BufferedReader {
      * 
      * @return  La línea de entrada procesada
      */
+    @SuppressWarnings("deprecation")
     @Override
     public String readLine() throws IOException {
         Console view = new Console();

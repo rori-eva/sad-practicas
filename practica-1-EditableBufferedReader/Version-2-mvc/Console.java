@@ -2,11 +2,11 @@
  * Siguiendo el patrón MVC esta clase es del tipo View
  */
 
- import java.io.IOException;
- import java.util.Observable;
- import java.util.Observer;
+import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
 
- @SuppressWarnings("deprecation")
+@SuppressWarnings("deprecation")
 public class Console implements Observer {
     /**
      * Actualiza el objeto observado cada vez que cambia de valor
@@ -20,8 +20,7 @@ public class Console implements Observer {
             Line line = (Line) o;
             System.out.print("\u001b[2K\u001b[G");  // Borramos la línea y nos situamos al inicio
             System.out.print(line.toString());      // Imprimimos la linea
-            System.out.print("\u001b["+(line.getCursorPosition()+1)+"G");   // Nos situamos en la posición de la línea 
-
+            System.out.print("\u001b["+(line.getCursorPosition()+1)+"G");   // Nos situamos en la posición de la línea
         }
     }
 
@@ -31,7 +30,6 @@ public class Console implements Observer {
      * Lee carácter a carácter sin esperar el ENTER
      * 
      * @throws  IOException
-
      */
     public void setRaw() throws IOException {
         Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", "stty -echo raw < /dev/tty" });
