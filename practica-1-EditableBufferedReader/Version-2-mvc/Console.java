@@ -8,6 +8,7 @@ import java.util.Observer;
 
 @SuppressWarnings("deprecation")
 public class Console implements Observer {
+
     /**
      * Actualiza el objeto observado cada vez que cambia de valor
      * 
@@ -16,8 +17,7 @@ public class Console implements Observer {
      */
     @Override
     public void update(Observable o, Object arg) {
-        if (o instanceof Line) {
-            Line line = (Line) o;
+        if (o instanceof Line line) {
             System.out.print("\u001b[2K\u001b[G");  // Borramos la línea y nos situamos al inicio
             System.out.print(line.toString());      // Imprimimos la linea
             System.out.print("\u001b["+(line.getCursorPosition()+1)+"G");   // Nos situamos en la posición de la línea
