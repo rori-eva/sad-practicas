@@ -20,8 +20,7 @@ public class EditableBufferedReader extends BufferedReader {
     private static final int FIN              = -70;
     private static final int INSERT           = -50;
     private static final int SUPRIMIR         = -51;
-    private static final int BACKSPACE        = 8;
-    private static final int UNRECOGNIZED_KEY = -256; // Valor por defecto para teclas no reconocidas
+    private static final int BACKSPACE        = 127;
 
     /**
      * Constructor de la clase EditableBufferedReader
@@ -36,7 +35,7 @@ public class EditableBufferedReader extends BufferedReader {
      * Lee carácter a carácter la entradam
      * Es una función genérica
      * 
-     * @return  el carácter leído en código ASCII o, -1 en caso de no reconocer el carácter o no insertar un carácter
+     * @return    El carácter leído en código ASCII o, -1 en caso de no reconocer el carácter o no insertar un carácter
      */
     @Override
     public int read() throws IOException {
@@ -46,17 +45,18 @@ public class EditableBufferedReader extends BufferedReader {
             if (super.read() == '[') {
                 // Lee la tercera parte de la secuencia de escape
                 // Manejar las teclas de flechas y otras especiales
-                return switch (super.read()) {
-                    case 'A' -> FLECHA_ARRIBA;
-                    case 'B' -> FLECHA_ABAJO;
-                    case 'C' -> FLECHA_DERECHA;
-                    case 'D' -> FLECHA_IZQUIERDA;
-                    case 'H' -> INICIO;
-                    case 'F' -> FIN;
-                    case '2' -> (super.read() == '~') ? INSERT : -1;
-                    case '3' -> (super.read() == '~') ? SUPRIMIR : -1;
-                    default -> UNRECOGNIZED_KEY;
-                }; //  Si no se reconoce la secuencia de escape, retorna -1
+                //  Si no se reconoce la secuencia de escape, retorna -1
+                switch (super.read()) {
+                    case 'A':   return FLECHA_ARRIBA;
+                    case 'B':   return FLECHA_ABAJO;
+                    case 'C':   return FLECHA_DERECHA;
+                    case 'D':   return FLECHA_IZQUIERDA;
+                    case 'H':   return INICIO;
+                    case 'F':   return FIN;
+                    case '2':   return (super.read() == '~') ? INSERT : -1;
+                    case '3':   return (super.read() == '~') ? SUPRIMIR : -1;
+                    default:    return -1;
+                }
             }
         }
         // Retornará también BACKSPACE, EOF y ENTER
@@ -67,16 +67,18 @@ public class EditableBufferedReader extends BufferedReader {
      * Lee la línea de entrada del usuario y la procesa
      * Permite la edición de línea mientras se escribe
      * 
-     * @return  La línea de entrada procesada
+     * @return    La línea de entrada procesada
      */
     @SuppressWarnings("deprecation")
     @Override
     public String readLine() throws IOException {
         Console view = new Console();
         MultiLine lines = new MultiLine();
+        int charCode;
+
         lines.addObserver(view);
         view.setRaw();
-        int charCode;
+        lines.setDimensions(view.getScreenTerminalSize()[0], view.getScreenTerminalSize()[1]);
 
         while ((charCode = this.read()) != EOF) {    // -1 es Ctrl+D (EOF)
             switch (charCode) {
@@ -90,11 +92,13 @@ public class EditableBufferedReader extends BufferedReader {
                 case SUPRIMIR:          lines.suprimir();                break;
                 case INSERT:            lines.alternarModoInsert();      break;
                 case ENTER:             lines.nuevaLinea();              break;
-                case UNRECOGNIZED_KEY:  continue;    // Ignora teclas no reconocidas
+                case -1:  continue;    // Ignora teclas no reconocidas
                 default:                lines.insertar((char) charCode); break;
             }
             System.out.flush();
         }
+
+        lines.setCursorFila(lines.getLineasLength());
         view.unsetRaw();
 
         return lines.toString();

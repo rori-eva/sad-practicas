@@ -2,18 +2,18 @@
  * La clase Line maneja todas las acciones relacionadas con la línea de texto.
  * Model class
  */
-import java.io.IOException;
 import java.util.Observable;
 
 @SuppressWarnings("deprecation")
 public class Line extends Observable {
     // Atributos de la clase Line
-    private final StringBuilder line;     // La linea a dibujar
-    private boolean modoInsert;     // Modo insertar o sustituir
-    protected int cursorColumna;  // Posicion del cursor (indica la columna en la que está el cursor)
-
+    private final StringBuilder line;    // La línea de texto que se está editando
+    protected boolean modoInsert;        // Indica si está en modo de inserción o sustitución
+    protected int cursorColumna;         // Posicion del cursor (columna actual)
+    protected int maxFilas, maxCols;     // Dimensiones máximas de la ventana de texto
+    
     /**
-     * Constructor de la clase Line
+     * Constructor de la clase Line, inicializa una línea vacía
      */
     public Line() {
         this.line = new StringBuilder("");
@@ -22,21 +22,23 @@ public class Line extends Observable {
     }
 
     /**
+     * Constructor de la clase Line con texto inicial
+     * 
+     * @param string    El texto inicial de la línea
+     */
+    public Line(StringBuilder string) {
+        this.line = string;
+        cursorColumna = 0;
+        modoInsert = false;
+    }
+
+    /**
      * Obtiene la posición actual del cursor en la línea
      *
-     * @return    La posición del cursor, la columna en la que está
+     * @return    La posición del cursor (columna actual)
      */
     public int getCursorColumna() {
         return cursorColumna;
-    }
-
-    public void setCursorColumna(int nuevoCursorColumna) throws IOException {
-        int maxColumnaTerm = Console.getScreenTerminalSize()[1];
-        if ((nuevoCursorColumna >= 0 && nuevoCursorColumna <= this.getLineLength()-1) && (nuevoCursorColumna <= maxColumnaTerm)) {
-            this.cursorColumna = nuevoCursorColumna;
-            setChanged();
-            notifyObservers();
-        }
     }
 
     /**
@@ -46,6 +48,39 @@ public class Line extends Observable {
      */
     public int getLineLength() {
         return line.length();
+    }
+
+    /**
+     * Comprueba si la linea está en modo INSERT
+     *
+     * @return    true si está en modo INSERT, false en caso contrario
+     */
+    public boolean isModoInsert() {
+        return modoInsert;
+    }
+
+    /**
+     * Establece las dimensiones de la terminal
+     * 
+     * @param maxFilas    El número máximo de filas de la terminal
+     * @param maxCols     El número máximo de columnas de la terminal
+     */
+    public void setDimensions(int maxFilas, int maxCols) {
+        this.maxFilas = maxFilas;
+        this.maxCols = maxCols;
+    }
+
+    /**
+     * Establece la nueva posición del cursorColumna
+     * 
+     * @param nuevoCursorColumna    La nueva posición del cursorColumna
+     */
+    public void setCursorColumna(int nuevoCursorColumna) {
+        if (nuevoCursorColumna >= 0 && (nuevoCursorColumna <= this.getLineLength() || nuevoCursorColumna <= maxCols)) {
+            this.cursorColumna = nuevoCursorColumna;
+            setChanged();
+            notifyObservers();
+        }
     }
 
     /**
@@ -90,10 +125,10 @@ public class Line extends Observable {
 
     /**
      * Inserta un carácter en la posición actual del cursor,
-     * reemplazando el carácter existente si se encuentra en modo INSERT
+     * Reemplaza el carácter existente si está en modo INSERT
      * Tecla INSERT
      * 
-     * @param c             El carácter a insertar
+     * @param c  El carácter a insertar
      */
     public void insertar(char c) {
         if(c>=32 && c<=126) {
@@ -111,20 +146,16 @@ public class Line extends Observable {
                 }
             }
             cursorColumna++;   // Avanzamos el cursor después de la inserción/reemplazo
-
-        } else if (c == '\n') {
-            line.append('\n');
-            cursorColumna=0;
         }
         setChanged();
         notifyObservers();
     }
 
     /**
-     * Alterna el boolean modoInsert en cuanto es tecleada de nuevo la tecla INSERT
+     * Alterna el modoInsert en cuanto es tecleada de nuevo la tecla INSERT
      */
     public void alternarModoInsert() {
-        this.modoInsert = !this.modoInsert;
+        modoInsert = !modoInsert;
     }
 
     /**
@@ -143,6 +174,7 @@ public class Line extends Observable {
 
     /**
      * Suprime el carácter en la posición actual del cursor, tecla DEL (suprimir)
+     * No afecta en la posición del cursorColumna
      */
     public void suprimir() {
         if (cursorColumna < line.length()) {
@@ -152,10 +184,28 @@ public class Line extends Observable {
         }
     }
 
-    public void concatenarConAnterior(Line newLine) {
-        line.append(newLine.toString());
+    /**
+     * Concatena una nueva linea al final de la línea actual
+     * 
+     * @param linia    La línea a concatenar
+     */
+    public void concatenarLineas(Line linia) {
+        line.append(linia.toString());
         setChanged();
         notifyObservers();
+    }
+
+    /**
+     * Recorta la linea actual desde una posición determinada
+     * 
+     * @param posicion    La posición desde donde se recortará la línea actual
+     * @return            Nueva linea con el texto desde la posición indicada
+     */
+    public Line recortarDesde(int posicion) {
+        String texto = line.substring(posicion, getLineLength());
+        line.delete(posicion, getLineLength());
+
+        return new Line(new StringBuilder(texto));
     }
 
     /**
