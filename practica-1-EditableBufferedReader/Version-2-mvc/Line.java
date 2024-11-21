@@ -7,7 +7,7 @@ import java.util.Observable;
 @SuppressWarnings("deprecation")
 public class Line extends Observable {
     // Atributos de la clase Line
-    private StringBuilder line;  // La linea a dibujar
+    private final StringBuilder line;  // La linea a dibujar
     private boolean modoInsert;  // Modo insertar o sustituir
     private int cursorPosition;  // Posicion del cursor
 
@@ -44,6 +44,8 @@ public class Line extends Observable {
     public void moverDerecha() {
         if (cursorPosition < line.length()) {
             cursorPosition++;
+            setChanged();
+            notifyObservers();
         }
     }
 

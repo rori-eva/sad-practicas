@@ -55,7 +55,7 @@ public class EditableBufferedReader extends BufferedReader {
                     case 'F':   return FIN;
                     case '2':   return (super.read() == '~') ? INSERT : -1;
                     case '3':   return (super.read() == '~') ? SUPRIMIR : -1;
-                    default:    return -1;
+                    default:    return -1;  //Si no se reconoce la secuencia de escape, retorna -1
                 }
             }
         }

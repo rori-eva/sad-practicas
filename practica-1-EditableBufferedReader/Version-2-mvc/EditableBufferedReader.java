@@ -4,8 +4,8 @@
  */
 
 import java.io.BufferedReader;
-import java.io.Reader;
 import java.io.IOException;
+import java.io.Reader;
 
 public class EditableBufferedReader extends BufferedReader {
     // Constantes privadas
@@ -16,7 +16,7 @@ public class EditableBufferedReader extends BufferedReader {
     private static final int FIN              = -70;
     private static final int INSERT           = -50;
     private static final int SUPRIMIR         = -51;
-    private static final int BACKSPACE        = -127;
+    private static final int BACKSPACE        = 127;
 
     /**
      * Constructor de la clase EditableBufferedReader
@@ -46,19 +46,13 @@ public class EditableBufferedReader extends BufferedReader {
                     case 'D':    return FLECHA_IZQUIERDA;
                     case 'H':    return INICIO;
                     case 'F':    return FIN;
-                    case '2':
-                        if (super.read() == '~')    return INSERT;
-                        break;
-                    case '3':
-                        if (super.read() == '~')    return SUPRIMIR;
-                        break;
+                    case '2':    return (super.read() == '~') ? INSERT : -1;
+                    case '3':    return (super.read() == '~') ? SUPRIMIR : -1;
                     default:    return -1;  //  Si no se reconoce la secuencia de escape, retorna -1
                 }
             }
-        } else if (charCode == 127) {
-            return BACKSPACE;
         }
-
+        // Retornará también BACKSPACE y ENTER
         return charCode;
     }
 

@@ -3,22 +3,20 @@
  */
 
 import java.io.BufferedReader;
-import java.io.Reader;
 import java.io.IOException;
+import java.io.Reader;
 
 public class EditableBufferedReader extends BufferedReader {
     // Constantes privadas
     private static final int ENTER            = 10;
     private static final int ESCAPE           = 27;
-    private static final int FLECHA_ARRIBA    = -65;
-    private static final int FLECHA_ABAJO     = -66;
     private static final int FLECHA_DERECHA   = -67;
     private static final int FLECHA_IZQUIERDA = -68;
     private static final int INICIO           = -72;
     private static final int FIN              = -70;
     private static final int INSERT           = -50;
     private static final int SUPRIMIR         = -51;
-    private static final int BACKSPACE        = -127;
+    private static final int BACKSPACE        = 127;
 
     /**
      * Constructor de la clase EditableBufferedReader
@@ -62,26 +60,20 @@ public class EditableBufferedReader extends BufferedReader {
         // Si detectamos una secuencia de escape (ASCII 27), podemos leer las siguientes teclas
         if (charCode == ESCAPE) {
             if (super.read() == '[') {
-                 // Lee la tercera parte de la secuencia de escape
+                // Lee la tercera parte de la secuencia de escape
                 // Manejar las teclas de flechas y otras especiales
                 switch (super.read()) {
                     case 'C':    return FLECHA_DERECHA;
                     case 'D':    return FLECHA_IZQUIERDA;
                     case 'H':    return INICIO;
                     case 'F':    return FIN;
-                    case '2':
-                        if (super.read() == '~')    return INSERT;
-                        break;
-                    case '3':
-                        if (super.read() == '~')    return SUPRIMIR;
-                        break;
+                    case '2':    return (super.read() == '~') ? INSERT : -1;
+                    case '3':    return (super.read() == '~') ? SUPRIMIR: -1;
                     default:    return -1;  //  Si no se reconoce la secuencia de escape, retorna -1
                 }
             }
-        } else if (charCode == 127) {
-            return BACKSPACE;
         }
-
+        // Retornará también BACKSPACE y ENTER
         return charCode;
     }
 
@@ -97,7 +89,7 @@ public class EditableBufferedReader extends BufferedReader {
         int charCode = 0;
         this.setRaw();
 
-        while ((charCode = this.read()) != '\r') { // '\r' es el ENTER en modo raw
+        while ((charCode = this.read()) != ENTER) {
             if (charCode == -1) {
                 // Cuando read() devuelve -1, indica que el modo de inserción fue activado/desactivado
                 continue; // Continua con el siguiente ciclo sin insertar nada
