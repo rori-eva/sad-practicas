@@ -69,7 +69,6 @@ public class EditableBufferedReader extends BufferedReader {
                     case 'F':    return FIN;
                     case '2':    return (super.read() == '~') ? INSERT : -1;
                     case '3':    return (super.read() == '~') ? SUPRIMIR: -1;
-                    default:    return -1;  //  Si no se reconoce la secuencia de escape, retorna -1
                 }
             }
         }
@@ -89,7 +88,7 @@ public class EditableBufferedReader extends BufferedReader {
         int charCode = 0;
         this.setRaw();
 
-        while ((charCode = this.read()) != ENTER) {
+        while ((charCode = this.read()) != '\r') {  // Es ENTER en modo raw
             if (charCode == -1) {
                 // Cuando read() devuelve -1, indica que el modo de inserción fue activado/desactivado
                 continue; // Continua con el siguiente ciclo sin insertar nada
