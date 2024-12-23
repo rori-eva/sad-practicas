@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ChatServer {
     private final Map<String, MySocket> clients;
-    private final ReentrantReadWriteLock lock;
 
     public ChatServer() {
         // Crear un Map sincronizado
         clients = Collections.synchronizedMap(new HashMap<>());
-        lock = new ReentrantReadWriteLock();
     }
 
     public void start(int port) {
@@ -43,12 +40,9 @@ public class ChatServer {
             }
             // Añadir el cliente al Map
 
-            lock.writeLock().lock();
-            try {
+            synchronized (clients) {
                 clients.put(nick, client);
                 broadcast("Servidor", "Se ha conectado " + nick);
-            } finally {
-                lock.writeLock().unlock();
                 System.out.println("Nuevo cliente registrado con nick: " + nick);
             }
 
@@ -72,8 +66,7 @@ public class ChatServer {
     }
 
     private void broadcast(String senderNick, String message) {
-        lock.readLock().lock();
-        try {
+        synchronized (clients) {
             clients.forEach((nick, socket) -> {
                 if (!nick.equals(senderNick)) {
                     try {
@@ -83,23 +76,20 @@ public class ChatServer {
                     }
                 }
             });
-        } finally {
-            lock.readLock().unlock();
         }
     }
 
     private void removeClient(String nick) {
-        lock.writeLock().lock();
         try {
-            MySocket client = clients.remove(nick);
-            if (client != null) {
-                client.close();
-                broadcast("Servidor", nick + " se ha desconectado");
+            synchronized (clients) {
+                MySocket client = clients.remove(nick);
+                if (client != null) {
+                    client.close();
+                    broadcast("Servidor", nick + " se ha desconectado");
+                }
             }
         } catch (IOException e) {
             System.out.println("Error al cerrar el cliente: " + e.getMessage());
-        } finally {
-            lock.writeLock().unlock();
         }
     }
 
