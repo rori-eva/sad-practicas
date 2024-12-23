@@ -1,4 +1,4 @@
-package practica2;
+package practica3;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -40,6 +40,7 @@ public class ChatServer {
             synchronized (clients) {
                 clients.put(nick, client);
                 broadcast("Servidor", "Se ha conectado " + nick);
+                broadcastUserList();
                 System.out.println("Nuevo cliente registrado con nick: " + nick);
             }
 
@@ -56,6 +57,7 @@ public class ChatServer {
         } finally {
             if (nick != null) {
                 removeClient(nick);
+                broadcastUserList();
             }
         }
     }
@@ -68,6 +70,18 @@ public class ChatServer {
                 } catch (Exception e) {
                     System.out.println("Error enviando a " + nick + ": " + e.getMessage());
                 }
+            });
+        }
+    }
+
+    private void broadcastUserList() {
+        synchronized (clients) {
+            StringBuilder userList = new StringBuilder("::USERS::");
+            clients.keySet().forEach(user -> userList.append(user).append(","));
+
+            String userListMessage = userList.toString();
+            clients.values().forEach(client -> {
+                client.send(userListMessage);
             });
         }
     }
