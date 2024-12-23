@@ -9,14 +9,14 @@ public class ChatClient {
         try {
             MySocket client = new MySocket("localhost", 12345);
             BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Conectado al servidor. Escribe tus mensajes:");
+            System.out.println("Conectado al servidor. Escribe primero tu numbre, da a ENTER y puedes escribir tus mensajes:");
 
             // Hilo para manejar la entrada del servidor
             Thread inputThread = new Thread(() -> {
                 try {
                     String response;
                     while ((response = client.receive()) != null) {
-                        System.out.println("Servidor: " + response);
+                        System.out.println(response);
                     }
                 } catch (IOException e) {
                     System.out.println("Error al recibir datos del servidor: " + e.getMessage());
@@ -29,7 +29,12 @@ public class ChatClient {
                 try {
                     String input;
                     while ((input = console.readLine()) != null) {
-                        client.send(input);
+                        if (input.equalsIgnoreCase("exit")) {
+                            client.send("::EXIT::");
+                            break;
+                        } else {
+                            client.send(input);
+                        }
                     }
                 } catch (IOException e) {
                     System.out.println("Error al enviar datos al servidor: " + e.getMessage());

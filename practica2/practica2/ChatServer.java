@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ChatServer {
     private final Map<String, MySocket> clients;
+    private final ReentrantReadWriteLock lock;
 
     public ChatServer() {
         // Crear un Map sincronizado
         clients = Collections.synchronizedMap(new HashMap<>());
+        lock = new ReentrantReadWriteLock();
     }
 
     public void start(int port) {
@@ -30,32 +33,47 @@ public class ChatServer {
     }
 
     private void handleClient(MySocket client) {
+        String nick = null;
         try {
             // Leer el nick del cliente
-            String nick = client.receive();
+            nick = client.receive();
             if (nick == null || nick.isEmpty()) {
                 client.close();
                 return;
             }
-
             // Añadir el cliente al Map
-            clients.put(nick, client);
-            System.out.println("Cliente registrado con nick: " + nick);
+
+            lock.writeLock().lock();
+            try {
+                clients.put(nick, client);
+                broadcast("Servidor", "Se ha conectado " + nick);
+            } finally {
+                lock.writeLock().unlock();
+                System.out.println("Nuevo cliente registrado con nick: " + nick);
+            }
 
             // Escuchar mensajes del cliente
             String message;
             while ((message = client.receive()) != null) {
+                if(message.equals("::EXIT::")) {
+                    System.out.println(nick + " se ha desconectado.");
+                    break;
+                }
                 broadcast(nick, message);
             }
         } catch (IOException e) {
             System.out.println("Error con cliente: " + e.getMessage());
         } finally {
-            removeClient(client);
+            if (nick != null) {
+                removeClient(nick);
+                broadcast("Servidor", nick + " se ha desconectado.");
+            }
         }
     }
 
     private void broadcast(String senderNick, String message) {
-        synchronized (clients) {
+        lock.readLock().lock();
+        try {
             clients.forEach((nick, socket) -> {
                 if (!nick.equals(senderNick)) {
                     try {
@@ -65,17 +83,23 @@ public class ChatServer {
                     }
                 }
             });
+        } finally {
+            lock.readLock().unlock();
         }
     }
 
-    private void removeClient(MySocket client) {
-        synchronized (clients) {
-            clients.values().remove(client);
-        }
+    private void removeClient(String nick) {
+        lock.writeLock().lock();
         try {
-            client.close();
+            MySocket client = clients.remove(nick);
+            if (client != null) {
+                client.close();
+                broadcast("Servidor", nick + " se ha desconectado");
+            }
         } catch (IOException e) {
             System.out.println("Error al cerrar el cliente: " + e.getMessage());
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 

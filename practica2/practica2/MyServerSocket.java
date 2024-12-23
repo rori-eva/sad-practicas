@@ -4,22 +4,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 
 public class MyServerSocket implements AutoCloseable {
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
 
     public MyServerSocket(int port) throws IOException {
-        try {
-            this.serverSocket = new ServerSocket(port);
-        } catch (IOException e) {
-            throw new IOException("Error al crear el servidor: " + e.getMessage());
-        }
+        this.serverSocket = new ServerSocket(port);
     }
 
     public MySocket accept() throws IOException {
-        try {
-            return new MySocket(serverSocket.accept());
-        } catch (IOException e) {
-            throw new IOException("Error al aceptar conexión: " + e.getMessage());
-        }
+        return new MySocket(serverSocket.accept());
     }
 
     @Override

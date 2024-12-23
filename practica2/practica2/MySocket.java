@@ -28,16 +28,26 @@ public class MySocket {
         }
     }
 
+    /**
+     * Escribe el mensaje por consola
+     * 
+     * @param  message  El mensaje a enviar/imprimir
+     */
     public void send(String message) {
         out.println(message);
     }
 
+    /**
+     * Lee el mensaje recibido
+     */
     public String receive() throws IOException {
         return in.readLine();
     }
 
     public void close() throws IOException {
         try {
+            in.close();
+            out.close();
             socket.close();
         } catch (IOException e) {
             throw new IOException("Error al cerrar el socket: " + e.getMessage());
