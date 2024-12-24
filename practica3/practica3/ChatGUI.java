@@ -2,7 +2,6 @@ package practica3;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.*;
 
@@ -56,19 +55,13 @@ public class ChatGUI extends JFrame {
         add(mainPanel);
 
         // Acción del botón enviar
-        sendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendMessage();
-            }
+        sendButton.addActionListener((ActionEvent e) -> {
+            sendMessage();
         });
 
         // Acción al presionar Enter en el campo de texto
-        inputField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendMessage();
-            }
+        inputField.addActionListener((ActionEvent e) -> {
+            sendMessage();
         });
 
         // Conectar al servidor
