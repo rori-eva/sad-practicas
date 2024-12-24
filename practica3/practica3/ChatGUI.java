@@ -6,11 +6,11 @@ import java.io.IOException;
 import javax.swing.*;
 
 public class ChatGUI extends JFrame {
-    private JTextArea chatArea;
-    private JTextField inputField;
+    private DefaultListModel<String> userModel;
     private JButton sendButton;
     private JList<String> userList;
-    private DefaultListModel<String> userModel;
+    private JTextArea chatArea;
+    private JTextField inputField;
     private MySocket socket;
     private String username;
 
@@ -28,6 +28,17 @@ public class ChatGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        initializeComponents();
+        setupActions();
+        connectToServer(host, port);
+
+        setVisible(true);
+    }
+
+    /**
+     * Inicializa los componentes gráficos de la interfaz
+     */
+    private void initializeComponents() {
         // Panel principal
         JPanel mainPanel = new JPanel(new BorderLayout());
 
@@ -60,7 +71,12 @@ public class ChatGUI extends JFrame {
 
         // Agregar panel principal a la ventana
         add(mainPanel);
+    }
 
+    /**
+     * Establece las acciones de los botones y campos de texto
+     */
+    private void setupActions() {
         // Acción del botón enviar
         sendButton.addActionListener((ActionEvent e) -> {
             sendMessage();
@@ -70,7 +86,15 @@ public class ChatGUI extends JFrame {
         inputField.addActionListener((ActionEvent e) -> {
             sendMessage();
         });
+    }
 
+    /**
+     * Conecta al servidor usando el host y el puerto proporcionado
+     * 
+     * @param host  La dirección del servidor
+     * @param port  El puerto del servidor
+     */
+    private void connectToServer(String host, int port) {
         // Conectar al servidor
         try {
             socket = new MySocket(host, port);
@@ -80,8 +104,6 @@ public class ChatGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Error al conectar al servidor: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
-
-        setVisible(true);
     }
 
     /**
