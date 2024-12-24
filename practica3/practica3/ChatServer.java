@@ -8,11 +8,19 @@ import java.util.Map;
 public class ChatServer {
     private final Map<String, MySocket> clients;
 
+    /**
+     * Constructor que inicializa el servidor de chat con una lista de clientes
+     */
     public ChatServer() {
         // Crear un Map sincronizado
         clients = Collections.synchronizedMap(new HashMap<>());
     }
 
+    /**
+     * Inicia el servidor en el puerto especificado y espera conexiones de clientes
+     * 
+     * @param port  El puerto en el que el servidor escuchará conexiones
+     */
     public void start(int port) {
         try (MyServerSocket server = new MyServerSocket(port)) {
             System.out.println("Servidor iniciado en el puerto " + port);
@@ -28,6 +36,11 @@ public class ChatServer {
         }
     }
 
+    /**
+     * Maneja las iteracciones con un cliente conectado
+     * 
+     * @param client  El socket del cliente conectado
+     */
     private void handleClient(MySocket client) {
         String nick = null;
         try {
@@ -62,6 +75,12 @@ public class ChatServer {
         }
     }
 
+    /**
+     * Envía un mensaje a todos los cliene conectados
+     * 
+     * @param senderNick    El nick del remitente del mensaje
+     * @param message       El contenido del mensaje a enviar
+     */
     private void broadcast(String senderNick, String message) {
         synchronized (clients) {
             clients.forEach((nick, socket) -> {
@@ -74,6 +93,9 @@ public class ChatServer {
         }
     }
 
+    /**
+     * Actualiza a todos los usuarios conectados a todos los usuarios conectados
+     */
     private void broadcastUserList() {
         synchronized (clients) {
             StringBuilder userList = new StringBuilder("::USERS::");
@@ -86,6 +108,11 @@ public class ChatServer {
         }
     }
 
+    /**
+     * Elimina un cliente de la lista y cierra su conexión
+     * 
+     * @param nick  El nick del cliente a eliminar
+     */
     private void removeClient(String nick) {
         try {
             synchronized (clients) {

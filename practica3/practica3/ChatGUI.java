@@ -14,6 +14,13 @@ public class ChatGUI extends JFrame {
     private MySocket socket;
     private String username;
 
+    /**
+     *  Constructor que inicializa la interfaz gráfica y establece la conexió con el servidor
+     * 
+     * @param host      La dirección del servidor al que el cliente se conectará
+     * @param port      El puerto del servidor
+     * @param username  El nombre de usuario del cliente
+     */
     public ChatGUI(String host, int port, String username) {
         this.username = username;
         setTitle("Chat - Usuario: " + username);
@@ -77,7 +84,9 @@ public class ChatGUI extends JFrame {
         setVisible(true);
     }
 
-    // Método para enviar mensajes
+    /**
+     * Envía el mensaje escrito en el campo de texto al servidor
+     */
     private void sendMessage() {
         String message = inputField.getText().trim();
         if (!message.isEmpty()) {
@@ -86,7 +95,10 @@ public class ChatGUI extends JFrame {
         }
     }
 
-    // Método para escuchar mensajes del servidor
+    /** 
+     * Escucha los mensajes enviados desde el servidor y los muestra en el área de chat
+     * Si se conecta un nuevo usuario, la lista de usuarios conectados se actualiza
+     */
     private void listenForMessages() {
         try {
             String message;
@@ -104,7 +116,11 @@ public class ChatGUI extends JFrame {
         }
     }
 
-    // Método para actualizar la lista de usuarios
+    /**
+     * Actualiza la lista de usuarios conectados en la interfaz gráfica
+     * 
+     * @param userList  La lista de usuarios conectados
+     */
     private void updateUserList(String userList) {
         SwingUtilities.invokeLater(() -> {
             userModel.clear();
@@ -114,7 +130,9 @@ public class ChatGUI extends JFrame {
         });
     }
 
-    // Método para cerrar la conexión
+    /**
+     * Cierra la conexión con el servidor
+     */
     private void closeConnection() {
         try {
             if (socket != null) {
