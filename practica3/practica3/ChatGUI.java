@@ -12,7 +12,7 @@ public class ChatGUI extends JFrame {
     private JTextArea chatArea;
     private JTextField inputField;
     private MySocket socket;
-    private String username;
+    private final String username;
 
     /**
      *  Constructor que inicializa la interfaz gráfica y establece la conexió con el servidor
